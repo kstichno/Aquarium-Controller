@@ -1,0 +1,54 @@
+﻿<ContentDialog
+    x:Class="Aquarium.LightingDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Aquarium"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Lighting PWM Setup"
+    PrimaryButtonText="Commit"
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick" Width="800" Height="480">
+
+    <Grid>
+        <StackPanel>
+            <TextBox x:Name="CHDayLightTextBox" Text="Day Light" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True" Margin="2"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
+                <StackPanel Margin="2" Width="90">
+                    <TextBox x:Name="CHOneTextBox" Text="CH 1 (R)" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True"/>
+                    <Slider x:Name="CHOneSlider" Maximum="100" TickFrequency="1" StepFrequency="1" SmallChange="1" LargeChange="1"/>
+                </StackPanel>
+                <StackPanel Margin="2" Width="90">
+                    <TextBox x:Name="CHTwoTextBox" Text="CH 2 (G)" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True"/>
+                    <Slider x:Name="CHTwoSlider" Maximum="100" TickFrequency="1" StepFrequency="1" SmallChange="1" LargeChange="1"/>
+                </StackPanel>
+                <StackPanel Margin="2" Width="90">
+                    <TextBox x:Name="CHThreeTextBox" Text="CH 3 (Y)" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True" Width="102"/>
+                    <Slider x:Name="CHThreeSlider" Maximum="100" TickFrequency="1" StepFrequency="1" SmallChange="1" LargeChange="1"/>
+                </StackPanel>
+                <StackPanel Margin="2" Width="90">
+                    <TextBox x:Name="CHFourTextBox" Text="CH 4 (UV)" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True"/>
+                    <Slider x:Name="CHFourSlider" Maximum="100" TickFrequency="1" StepFrequency="1" SmallChange="1" LargeChange="1"/>
+                </StackPanel>
+                <StackPanel Margin="2" Width="90">
+                    <TextBox x:Name="CHFiveTextBox" Text="CH 5 (W)" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True"/>
+                    <Slider x:Name="CHFiveSlider" Maximum="100" TickFrequency="1" StepFrequency="1" SmallChange="1" LargeChange="1"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBox x:Name="OnTimeTextBox" Text="On Time" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True" Width="100" Margin="5"/>
+                <TimePicker x:Name="OnTimePicker" Margin="5"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBox x:Name="OffTimeTextBox" Text="Off Time" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True" Width="100" Margin="5"/>
+                <TimePicker x:Name="OffTimePicker" Margin="5"/>
+            </StackPanel>
+            <StackPanel Margin="5">
+                <TextBox x:Name="CHNightLightTextBox" Text="Night Light" TextWrapping="Wrap" TextAlignment="Center" IsEnabled="False" IsReadOnly="True"/>
+                <Slider x:Name="CHNightLightSlider" Maximum="100" TickFrequency="1" StepFrequency="1" SmallChange="1" LargeChange="1" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</ContentDialog>
