@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.Storage;
+﻿using Windows.Storage;
 
 namespace Aquarium
 {
@@ -95,7 +94,6 @@ namespace Aquarium
     public class TemperatureData
     {
         public double XValue { get; set; }
-
         public double YValue { get; set; }
     }
 }

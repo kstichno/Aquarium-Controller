@@ -36,7 +36,7 @@
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
                     <Button x:Name="SetpointButton" Content="Set Point" IsEnabled="False" HorizontalAlignment="Center" Width="125" Margin="5" Height="40"/>
-                    <Slider x:Name="SetPointSlider" Maximum="100" TickFrequency="1" StepFrequency="1" SmallChange="1" LargeChange="1" VerticalAlignment="Center" Height="40" Width="125" HorizontalAlignment="Stretch"/>
+                    <Slider x:Name="SetPointSlider" Maximum="100" TickFrequency="1" StepFrequency="0.5" SmallChange="0.5" LargeChange="0.5" VerticalAlignment="Center" Height="40" Width="125" HorizontalAlignment="Stretch"/>
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
                     <Button x:Name="TimeOutButton" Content="Time Out (Mins)" IsEnabled="False" HorizontalAlignment="Center" Width="125" Margin="5" Height="40"/>

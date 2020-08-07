@@ -18,23 +18,15 @@ using LiveCharts;
 using LiveCharts.Uwp;
 using Microsoft.IoT.Lightning.Providers;
 
-
-
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
 namespace Aquarium
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
         CancellationTokenSource cancellationTokenSource;
         CancellationTokenSource cancellationTokenSourceCharts;
-        readonly CancellationTokenSource cancellationTokenSourceInputs;
+        CancellationTokenSource cancellationTokenSourceInputs;
         CancellationTokenSource cancellationTokenSourceFeed;
-        readonly CancellationTokenSource cancellationTokenSourceAuto;
+        CancellationTokenSource cancellationTokenSourceAuto;
 
         private const int OUTPUT_ONE = 23;
         private const int OUTPUT_TWO = 24;
@@ -90,7 +82,7 @@ namespace Aquarium
         public static SeriesCollection ChartOneSeries { get; set; }
         public static SeriesCollection ChartTwoSeries { get; set; }
 
-        private readonly SolidColorBrush defaultBackColor;
+        private SolidColorBrush defaultBackColor;
         private SolidColorBrush chartOneColor;
         private SolidColorBrush chartTwoColor;
 
@@ -121,11 +113,6 @@ namespace Aquarium
             Values.LightingModeAuto = true;
             Values.Feeding = false;
 
-            //if (LightningProvider.IsLightningEnabled)
-            //{
-            //    
-            //}
-
             LowLevelDevicesController.DefaultProvider = LightningProvider.GetAggregateProvider();
 
             SetupPorts();
@@ -145,9 +132,7 @@ namespace Aquarium
             
             InitializeCharts();
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             Task.Run(() => UpdateInputsAsync());
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
         private async void InitializeI2CSensors()
@@ -195,10 +180,7 @@ namespace Aquarium
                 i2cDOSensor.Write(sendByteArr);
                 await Task.Delay(300);
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                UpdateI2CValuesAsync();
-                UpdateAutoOutputsAsync();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                await Task.WhenAll(UpdateI2CValuesAsync(), UpdateAutoOutputsAsync());
             }
             catch (Exception ex)
             {
@@ -291,9 +273,7 @@ namespace Aquarium
                 };
                 chartTwoColor = new SolidColorBrush(Colors.Magenta);
                 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                UpdateUIControlsAsync();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                await UpdateUIControlsAsync();
             }
             catch (Exception ex)
             {
@@ -318,9 +298,7 @@ namespace Aquarium
             await Task.Delay(500);
             cancellationTokenSourceCharts = new CancellationTokenSource();
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            UpdateUIControlsAsync();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            await UpdateUIControlsAsync();
         }
 
         private void ResetColors()
@@ -628,7 +606,7 @@ namespace Aquarium
                                 case 1:
                                     outputOne.ControlMode = int.Parse(Values.LoadStringSettings("ControlMode " + outputNumber.ToString()) ?? "0"); 
                                     outputOne.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode " + outputNumber.ToString()) ?? "0");
-                                    outputOne.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
+                                    outputOne.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
                                     outputOne.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut " + outputNumber.ToString()) ?? "0");
                                     outputOne.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn " + outputNumber.ToString()) ?? "0");
                                     outputOne.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff " + outputNumber.ToString()) ?? "0");
@@ -636,7 +614,7 @@ namespace Aquarium
                                 case 2:
                                     outputTwo.ControlMode = int.Parse(Values.LoadStringSettings("ControlMode " + outputNumber.ToString()) ?? "0"); 
                                     outputTwo.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode " + outputNumber.ToString()) ?? "0");
-                                    outputTwo.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
+                                    outputTwo.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
                                     outputTwo.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut " + outputNumber.ToString()) ?? "0");
                                     outputTwo.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn " + outputNumber.ToString()) ?? "0");
                                     outputTwo.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff " + outputNumber.ToString()) ?? "0");
@@ -644,7 +622,7 @@ namespace Aquarium
                                 case 3:
                                     outputThree.ControlMode = int.Parse(Values.LoadStringSettings("ControlMode " + outputNumber.ToString()) ?? "0"); 
                                     outputThree.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode " + outputNumber.ToString()) ?? "0");
-                                    outputThree.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
+                                    outputThree.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
                                     outputThree.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut " + outputNumber.ToString()) ?? "0");
                                     outputThree.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn " + outputNumber.ToString()) ?? "0");
                                     outputThree.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff " + outputNumber.ToString()) ?? "0");
@@ -652,7 +630,7 @@ namespace Aquarium
                                 case 4:
                                     outputFour.ControlMode = int.Parse(Values.LoadStringSettings("ControlMode " + outputNumber.ToString()) ?? "0"); 
                                     outputFour.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode " + outputNumber.ToString()) ?? "0");
-                                    outputFour.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
+                                    outputFour.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
                                     outputFour.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut " + outputNumber.ToString()) ?? "0");
                                     outputFour.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn " + outputNumber.ToString()) ?? "0");
                                     outputFour.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff " + outputNumber.ToString()) ?? "0");
@@ -660,7 +638,7 @@ namespace Aquarium
                                 case 5:
                                     outputFive.ControlMode = int.Parse(Values.LoadStringSettings("ControlMode " + outputNumber.ToString()) ?? "0"); 
                                     outputFive.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode " + outputNumber.ToString()) ?? "0");
-                                    outputFive.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
+                                    outputFive.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
                                     outputFive.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut " + outputNumber.ToString()) ?? "0");
                                     outputFive.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn " + outputNumber.ToString()) ?? "0");
                                     outputFive.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff " + outputNumber.ToString()) ?? "0");
@@ -668,7 +646,7 @@ namespace Aquarium
                                 case 6:
                                     outputSix.ControlMode = int.Parse(Values.LoadStringSettings("ControlMode " + outputNumber.ToString()) ?? "0"); 
                                     outputSix.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode " + outputNumber.ToString()) ?? "0");
-                                    outputSix.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
+                                    outputSix.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
                                     outputSix.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut " + outputNumber.ToString()) ?? "0");
                                     outputSix.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn " + outputNumber.ToString()) ?? "0");
                                     outputSix.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff " + outputNumber.ToString()) ?? "0");
@@ -676,7 +654,7 @@ namespace Aquarium
                                 case 7:
                                     outputSeven.ControlMode = int.Parse(Values.LoadStringSettings("ControlMode " + outputNumber.ToString()) ?? "0"); 
                                     outputSeven.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode " + outputNumber.ToString()) ?? "0");
-                                    outputSeven.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
+                                    outputSeven.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
                                     outputSeven.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut " + outputNumber.ToString()) ?? "0");
                                     outputSeven.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn " + outputNumber.ToString()) ?? "0");
                                     outputSeven.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff " + outputNumber.ToString()) ?? "0");
@@ -684,7 +662,7 @@ namespace Aquarium
                                 case 8:
                                     outputEight.ControlMode = int.Parse(Values.LoadStringSettings("ControlMode " + outputNumber.ToString()) ?? "0"); 
                                     outputEight.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode " + outputNumber.ToString()) ?? "0");
-                                    outputEight.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
+                                    outputEight.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn " + outputNumber.ToString()) ?? "0");
                                     outputEight.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut " + outputNumber.ToString()) ?? "0");
                                     outputEight.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn " + outputNumber.ToString()) ?? "0");
                                     outputEight.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff " + outputNumber.ToString()) ?? "0");
@@ -749,16 +727,18 @@ namespace Aquarium
                                     OutOneButton.Background = Values.InputTwo == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Temp:
-                                    if (Values.TemperatueValue < outputOne.AutoOnValue - 1.0)
+                                    if (Values.TemperatueValue < (outputOne.AutoOnValue - 0.5))
                                     {
                                         status = 1;
+                                        WriteOutput(pinOne, status, 1);
+                                        OutOneButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    if (Values.TemperatueValue > outputOne.AutoOnValue + 1.0)
+                                    else if (Values.TemperatueValue > (outputOne.AutoOnValue + 0.5))
                                     {
                                         status = 0;
+                                        WriteOutput(pinOne, status, 1);
+                                        OutOneButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    WriteOutput(pinOne, status, 1);
-                                    OutOneButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Salinity:
                                     break;
@@ -803,16 +783,18 @@ namespace Aquarium
                                     OutTwoButton.Background = Values.InputTwo == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Temp:
-                                    if (Values.TemperatueValue < outputTwo.AutoOnValue - 1.0)
+                                    if (Values.TemperatueValue < (outputTwo.AutoOnValue - 0.5))
                                     {
                                         status = 1;
+                                        WriteOutput(pinTwo, status, 2);
+                                        OutTwoButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    if (Values.TemperatueValue > outputTwo.AutoOnValue + 1.0)
+                                    else if (Values.TemperatueValue > (outputTwo.AutoOnValue + 0.5))
                                     {
                                         status = 0;
+                                        WriteOutput(pinTwo, status, 2);
+                                        OutTwoButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    WriteOutput(pinTwo, status, 2);
-                                    OutTwoButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Salinity:
                                     break;
@@ -857,16 +839,18 @@ namespace Aquarium
                                     OutThreeButton.Background = Values.InputTwo == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Temp:
-                                    if (Values.TemperatueValue < outputThree.AutoOnValue - 1.0)
+                                    if (Values.TemperatueValue < (outputThree.AutoOnValue - 0.5))
                                     {
                                         status = 1;
+                                        WriteOutput(pinThree, status, 3);
+                                        OutThreeButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    if (Values.TemperatueValue > outputThree.AutoOnValue + 1.0)
+                                    else if (Values.TemperatueValue > (outputThree.AutoOnValue + 0.5))
                                     {
                                         status = 0;
+                                        WriteOutput(pinThree, status, 3);
+                                        OutThreeButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    WriteOutput(pinThree, status, 3);
-                                    OutThreeButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Salinity:
                                     break;
@@ -911,16 +895,18 @@ namespace Aquarium
                                     OutFourButton.Background = Values.InputTwo == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Temp:
-                                    if (Values.TemperatueValue < outputFour.AutoOnValue - 1.0)
+                                    if (Values.TemperatueValue < (outputFour.AutoOnValue - 0.5))
                                     {
                                         status = 1;
+                                        WriteOutput(pinFour, status, 4);
+                                        OutFourButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    if (Values.TemperatueValue > outputFour.AutoOnValue + 1.0)
+                                    else if (Values.TemperatueValue > (outputFour.AutoOnValue + 0.5))
                                     {
                                         status = 0;
+                                        WriteOutput(pinFour, status, 4);
+                                        OutFourButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    WriteOutput(pinFour, status, 4);
-                                    OutFourButton.Background = status == 0 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Salinity:
                                     break;
@@ -965,16 +951,18 @@ namespace Aquarium
                                     OutFiveButton.Background = Values.InputTwo == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Temp:
-                                    if (Values.TemperatueValue < outputFive.AutoOnValue - 1.0)
+                                    if (Values.TemperatueValue < (outputFive.AutoOnValue - 0.5))
                                     {
                                         status = 1;
+                                        WriteOutput(pinFive, status, 5);
+                                        OutFiveButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    if (Values.TemperatueValue > outputFive.AutoOnValue + 1.0)
+                                    else if (Values.TemperatueValue > (outputFive.AutoOnValue + 0.5))
                                     {
                                         status = 0;
+                                        WriteOutput(pinFive, status, 5);
+                                        OutFiveButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    WriteOutput(pinFive, status, 5);
-                                    OutFiveButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Salinity:
                                     break;
@@ -1019,16 +1007,18 @@ namespace Aquarium
                                     OutSixButton.Background = Values.InputTwo == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Temp:
-                                    if (Values.TemperatueValue < outputSix.AutoOnValue - 1.0)
+                                    if (Values.TemperatueValue < (outputSix.AutoOnValue - 0.5))
                                     {
                                         status = 1;
+                                        WriteOutput(pinSix, status, 6);
+                                        OutSixButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    if (Values.TemperatueValue > outputSix.AutoOnValue + 1.0)
+                                    else if (Values.TemperatueValue > (outputSix.AutoOnValue + 0.5))
                                     {
                                         status = 0;
+                                        WriteOutput(pinSix, status, 6);
+                                        OutSixButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    WriteOutput(pinSix, status, 6);
-                                    OutSixButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Salinity:
                                     break;
@@ -1073,16 +1063,18 @@ namespace Aquarium
                                     OutSevenButton.Background = Values.InputTwo == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Temp:
-                                    if (Values.TemperatueValue < outputSeven.AutoOnValue - 1.0)
+                                    if (Values.TemperatueValue < (outputSeven.AutoOnValue - 0.5))
                                     {
                                         status = 1;
+                                        WriteOutput(pinSeven, status, 7);
+                                        OutSevenButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    if (Values.TemperatueValue > outputSeven.AutoOnValue + 1.0)
+                                    else if (Values.TemperatueValue > (outputSeven.AutoOnValue + 0.5))
                                     {
                                         status = 0;
+                                        WriteOutput(pinSeven, status, 7);
+                                        OutSevenButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    WriteOutput(pinSeven, status, 7);
-                                    OutSevenButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Salinity:
                                     break;
@@ -1127,16 +1119,18 @@ namespace Aquarium
                                     OutEightButton.Background = Values.InputTwo == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Temp:
-                                    if (Values.TemperatueValue < outputEight.AutoOnValue - 1.0)
+                                    if (Values.TemperatueValue < (outputEight.AutoOnValue - 0.5))
                                     {
                                         status = 1;
+                                        WriteOutput(pinEight, status, 8);
+                                        OutEightButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    if (Values.TemperatueValue > outputEight.AutoOnValue + 1.0)
+                                    else if (Values.TemperatueValue > (outputEight.AutoOnValue + 0.5))
                                     {
                                         status = 0;
+                                        WriteOutput(pinEight, status, 8);
+                                        OutEightButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     }
-                                    WriteOutput(pinEight, status, 8);
-                                    OutEightButton.Background = status == 1 ? new SolidColorBrush(Colors.DarkGreen) : defaultBackColor;
                                     break;
                                 case (int)Sensors.Salinity:
                                     break;
@@ -1308,11 +1302,11 @@ namespace Aquarium
 
                     if (!I2CUpdated)
                     {
-                        await Task.Delay(1000 * 10, cancellationTokenSourceCharts.Token); // 10 sec minute delay
+                        await Task.Delay(1000 * 10, cancellationTokenSourceCharts.Token); // 10 sec delay
                     }
                     else 
                     {
-                        await Task.Delay(1000 * 10 * 60, cancellationTokenSourceCharts.Token); // 10 min minute delay
+                        await Task.Delay(1000 * 10 * 60, cancellationTokenSourceCharts.Token); // 10 min delay
                     }
                 }
             }
@@ -1489,7 +1483,6 @@ namespace Aquarium
                         }
                     }
 
-
                     Values.LightingValue = Values.Power;
        
                     await Task.Delay(1000*60*10, cancellationTokenSourceInputs.Token);
@@ -1498,7 +1491,6 @@ namespace Aquarium
             catch (Exception ex)
             {
                 throw ex;
-
             }
         }
 
@@ -1605,9 +1597,7 @@ namespace Aquarium
                     }
                     cancellationTokenSource = new CancellationTokenSource();
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    UpdateI2CValuesAsync();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    await UpdateI2CValuesAsync();
                 }
                 else
                 {
@@ -1663,11 +1653,7 @@ namespace Aquarium
             cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSourceCharts = new CancellationTokenSource();
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            UpdateI2CValuesAsync();
-            UpdateUIControlsAsync();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-
+            await Task.WhenAll(UpdateI2CValuesAsync(), UpdateUIControlsAsync());
         }
 
         private void LoadProgramSettings()
@@ -1754,42 +1740,42 @@ namespace Aquarium
             FeedButton.Content = "Feed" + Environment.NewLine + Values.FeedDuration.ToString() + " min(s)";
 
             outputOne.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode 1") ?? "0");
-            outputOne.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn 1") ?? "0");
+            outputOne.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn 1") ?? "0");
             outputOne.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut 1") ?? "0");
             outputOne.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn 1") ?? "0");
             outputOne.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff 1") ?? "0");
             outputTwo.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode 2") ?? "0");
-            outputTwo.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn 2") ?? "0");
+            outputTwo.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn 2") ?? "0");
             outputTwo.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut 2") ?? "0");
             outputTwo.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn 2") ?? "0");
             outputTwo.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff 2") ?? "0");
             outputThree.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode 3") ?? "0");
-            outputThree.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn 3") ?? "0");
+            outputThree.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn 3") ?? "0");
             outputThree.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut 3") ?? "0");
             outputThree.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn 3") ?? "0");
             outputThree.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff 3") ?? "0");
             outputFour.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode 4") ?? "0");
-            outputFour.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn 4") ?? "0");
+            outputFour.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn 4") ?? "0");
             outputFour.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut 4") ?? "0");
             outputFour.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn 4") ?? "0");
             outputFour.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff 4") ?? "0");
             outputFive.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode 5") ?? "0");
-            outputFive.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn 5") ?? "0");
+            outputFive.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn 5") ?? "0");
             outputFive.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut 5") ?? "0");
             outputFive.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn 5") ?? "0");
             outputFive.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff 5") ?? "0");
             outputSix.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode 6") ?? "0");
-            outputSix.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn 6") ?? "0");
+            outputSix.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn 6") ?? "0");
             outputSix.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut 6") ?? "0");
             outputSix.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn 6") ?? "0");
             outputSix.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff 6") ?? "0");
             outputSeven.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode 7") ?? "0");
-            outputSeven.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn 7") ?? "0");
+            outputSeven.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn 7") ?? "0");
             outputSeven.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut 7") ?? "0");
             outputSeven.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn 7") ?? "0");
             outputSeven.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff 7") ?? "0");
             outputEight.AutoMode = int.Parse(Values.LoadStringSettings("AutoMode 8") ?? "0");
-            outputEight.AutoOnValue = int.Parse(Values.LoadStringSettings("AutoOn 8") ?? "0");
+            outputEight.AutoOnValue = double.Parse(Values.LoadStringSettings("AutoOn 8") ?? "0");
             outputEight.AutoTimeOut = int.Parse(Values.LoadStringSettings("AutoTimeOut 8") ?? "0");
             outputEight.AutoTimeOn = double.Parse(Values.LoadStringSettings("AutoTimeOn 8") ?? "0");
             outputEight.AutoTimeOff = double.Parse(Values.LoadStringSettings("AutoTimeOff 8") ?? "0");
